@@ -1,0 +1,113 @@
+{
+  "users": [
+    {
+      "type": "branch",
+      "branchCode": "ahmedabad",
+      "username": "Nagesh",
+      "password": "nagesh",
+      "name": "Ganga Travels"
+    },
+    {
+      "type": "company",
+      "branchCode": "CORP",
+      "username": "admin",
+      "password": "Rcargo",
+      "name": "Corporate Administrator"
+    }
+  ],
+  "branches": [
+    {
+      "code": "ahmedabad",
+      "name": "Ahmedabad"
+    },
+    {
+      "code": "anand",
+      "name": "Anand"
+    },
+    {
+      "code": "baroda",
+      "name": "Baroda"
+    },
+    {
+      "code": "bharuch",
+      "name": "Bharuch"
+    },
+    {
+      "code": "bhuj",
+      "name": "Bhuj"
+    },
+    {
+      "code": "ghandhidham",
+      "name": "Ghandhidham"
+    },
+    {
+      "code": "goregaon",
+      "name": "Goregaon"
+    },
+    {
+      "code": "himmatnagar",
+      "name": "Himmatnagar"
+    },
+    {
+      "code": "jamnagar",
+      "name": "Jamnagar"
+    },
+    {
+      "code": "mehsana",
+      "name": "Mehsana"
+    },
+    {
+      "code": "mumbai",
+      "name": "Mumbai"
+    },
+    {
+      "code": "nadiad",
+      "name": "Nadiad"
+    },
+    {
+      "code": "navsari",
+      "name": "Navsari"
+    },
+    {
+      "code": "pune",
+      "name": "Pune"
+    },
+    {
+      "code": "rajkot",
+      "name": "Rajkot"
+    },
+    {
+      "code": "surat",
+      "name": "Surat"
+    },
+    {
+      "code": "vadodara",
+      "name": "Vadodara"
+    },
+    {
+      "code": "valsad",
+      "name": "Valsad"
+    },
+    {
+      "code": "vapi",
+      "name": "Vapi"
+    },
+    {
+      "code": "vasai",
+      "name": "Vasai"
+    }
+  ],
+  "bookings": [],
+  "news": [
+    {
+      "date": "2026-06-26",
+      "title": "Route Expansion: 18 Active Gujarat-Maharashtra Hubs",
+      "content": "Our logistical routes are now fully active across 18 major hubs including Gandhidham, Mehsana, Vasai, and Goregaon."
+    },
+    {
+      "date": "2026-06-25",
+      "title": "System Upgrade: Parcel Booking V4 Released",
+      "content": "We have launched the new booking interface (V4.aspx) to optimize branch operations and load time. Features include dynamic weight tariffs, auto GST calculations, and instant thermal receipt printing."
+    }
+  ]
+}

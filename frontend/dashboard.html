@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rcargo Dashboard - Branch Operations Control Room</title>
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="dashboard-body">
+
+  <div class="dashboard-container">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-container">
+          <div class="logo-icon"><i class="fa-solid fa-truck-fast"></i></div>
+          <div class="logo-text">R<span>cargo</span></div>
+        </div>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item active" id="menu-overview">
+          <a href="#" onclick="switchTab('overview')">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Dashboard Overview</span>
+          </a>
+        </li>
+        <li class="menu-item" id="menu-booking">
+          <a href="#" onclick="switchTab('booking')">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Parcel Booking V4</span>
+          </a>
+        </li>
+        <li class="menu-item" id="menu-tracking">
+          <a href="#" onclick="switchTab('tracking')">
+            <i class="fa-solid fa-magnifying-glass-location"></i>
+            <span>Search & Track</span>
+          </a>
+        </li>
+        <li class="menu-item" id="menu-reports">
+          <a href="#" onclick="switchTab('reports')">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            <span>Branch Reports</span>
+          </a>
+        </li>
+        <li class="menu-item" id="menu-admin" style="display: none;">
+          <a href="#" onclick="switchTab('admin')">
+            <i class="fa-solid fa-users-gear"></i>
+            <span>Admin Panel</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <h5 id="sideUserName">Loading...</h5>
+            <p id="sideUserRole">Agent - Branch</p>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="handleLogout()" title="Log out from system">
+          <i class="fa-solid fa-power-off"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace Area -->
+    <main class="main-content">
+
+      <!-- Top Header Bar -->
+      <header class="top-bar">
+        <div class="top-bar-title">
+          <h2 id="currentTabTitle">Dashboard Overview</h2>
+        </div>
+        <div class="top-bar-actions">
+          <span style="font-weight: 500; font-size: 0.85rem;" id="topHeaderBranch">Branch: Loading...</span>
+          <div class="avatar" id="topHeaderAvatar" style="width:30px; height:30px; font-size:0.8rem;">B</div>
+        </div>
+      </header>
+
+      <!-- Content body with tab content panels -->
+      <div class="content-body">
+
+        <!-- overview -->
+        <div id="tab-overview" class="dashboard-tab active">
+
+          <!-- Metric counters -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-details">
+                <h4>Consignments Booked</h4>
+                <h3 id="statTotalBookings">0</h3>
+              </div>
+              <div class="metric-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-details">
+                <h4>Total Revenue Collected</h4>
+                <h3 id="statTotalRevenue">₹0</h3>
+              </div>
+              <div class="metric-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-details">
+                <h4>Average Revenue / LR</h4>
+                <h3 id="statAverageRevenue">₹0</h3>
+              </div>
+              <div class="metric-icon"><i class="fa-solid fa-calculator"></i></div>
+            </div>
+          </div>
+
+          <div class="grid-2col">
+            <!-- Payment mode split breakdown -->
+            <section class="section-panel" style="margin-bottom:0;">
+              <h3 class="panel-header"><i class="fa-solid fa-coins"></i> Billing Payment Splits</h3>
+              <div class="tariff-grid" style="gap:15px; margin-top:1rem;">
+                <div class="tariff-row">
+                  <span>Paid:</span>
+                  <strong id="statPaidCount" style="color:var(--accent-green); font-size:1.1rem;">0</strong>
+                </div>
+                <div class="tariff-row">
+                  <span>To Pay:</span>
+                  <strong id="statToPayCount" style="color:var(--accent-yellow); font-size:1.1rem;">0</strong>
+                </div>
+                <div class="tariff-row">
+                  <span>Corporate Client (Account):</span>
+                  <strong id="statAccountCount" style="color:var(--accent-blue); font-size:1.1rem;">0</strong>
+                </div>
+              </div>
+            </section>
+
+            <!-- Quick Guidelines Panel -->
+            <section class="section-panel" style="margin-bottom:0;">
+              <h3 class="panel-header"><i class="fa-solid fa-circle-info"></i> Operations Quick Guidelines</h3>
+              <ul
+                style="color: var(--text-muted); font-size:0.85rem; padding-left:1.25rem; display:flex; flex-direction:column; gap:10px;">
+                <li>Before printing any Lorry Receipt (LR), confirm weight tolerances. Actual Weight should never exceed
+                  Charged Weight.</li>
+                <li>Verify consignee mobile numbers to ensure delivery notifications are properly delivered.</li>
+                <li>GST is default calculated at <strong>18%</strong> on basic freight and surcharges combined.</li>
+              </ul>
+            </section>
+          </div>
+
+          <!-- Recent Bookings section -->
+          <div class="table-container">
+            <div
+              style="padding:16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:1.1rem; font-weight:600; color:var(--text-main);"><i
+                  class="fa-solid fa-clock-rotate-left" style="margin-right:8px;"></i> Recent Shipments</h3>
+              <button class="btn-primary" style="padding: 6px 12px; font-size:0.8rem; border-radius:6px;"
+                onclick="switchTab('booking')">Book New Cargo</button>
+            </div>
+            <table class="data-table" id="dashboardRecentTable">
+              <thead>
+                <tr>
+                  <th>LR Number</th>
+                  <th>Date & Time</th>
+                  <th>Origin</th>
+                  <th>Destination</th>
+                  <th>Consignor</th>
+                  <th>Consignee</th>
+                  <th>Payment</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="10" style="text-align: center; color: var(--text-muted);">Loading transactions...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- parcel booking (v4) -->
+        <div id="tab-booking" class="dashboard-tab">
+
+          <form id="bookingForm" onsubmit="handleCreateBooking(event)">
+            <div class="booking-grid">
+
+              <!-- Left Form Sections -->
+              <div class="form-columns-left">
+
+                <!-- Consignor Details Section -->
+                <section class="section-panel">
+                  <h3 class="panel-header"><i class="fa-solid fa-circle-arrow-up"></i> Sender Details</h3>
+                  <div class="grid-3col">
+                    <div class="form-group">
+                      <label class="form-label" for="bookOrigin"> From </label>
+                      <select id="bookOrigin" class="booking-form-select" required>
+                        <!-- Dynamic list of branches -->
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="bookSenderName">Sender Name</label>
+                      <input type="text" id="bookSenderName" class="form-input" style="padding-left:12px;"
+                        placeholder="Enter sender name" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="bookSenderMobile">Sender Mobile</label>
+                      <input type="tel" id="bookSenderMobile" class="form-input" style="padding-left:12px;"
+                        placeholder="10-digit mobile" required pattern="[0-9]{10}">
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Consignee Details Section -->
+                <section class="section-panel">
+                  <h3 class="panel-header"><i class="fa-solid fa-circle-arrow-down"></i> Receiver Details</h3>
+                  <div class="grid-3col">
+                    <div class="form-group">
+                      <label class="form-label" for="bookDest"> To </label>
+                      <select id="bookDest" class="booking-form-select" required>
+                        <!-- Dynamic list of branches -->
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="bookReceiverName">Receiver Name</label>
+                      <input type="text" id="bookReceiverName" class="form-input" style="padding-left:12px;"
+                        placeholder="Enter receiver name" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="bookReceiverMobile">Receiver Mobile</label>
+                      <input type="tel" id="bookReceiverMobile" class="form-input" style="padding-left:12px;"
+                        placeholder="10-digit mobile" required pattern="[0-9]{10}">
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Parcel Details Section -->
+                <section class="section-panel">
+                  <h3 class="panel-header"><i class="fa-solid fa-box"></i> Parcel Details</h3>
+                  <div class="grid-3col">
+                    <div class="form-group">
+                      <label class="form-label" for="bookArticleType">Article Type</label>
+                      <select id="bookArticleType" class="booking-form-select">
+                        <option value="Box">Box / Case</option>
+                        <option value="Bag">Bag / Sack</option>
+                        <option value="Carton">Carton Box</option>
+                        <option value="Wooden Box">Wooden Box</option>
+                        <option value="Crate">Metal Crate</option>
+                        <option value="Bundle">Bundle</option>
+                        <option value="Other">Loose cargo</option>
+                      </select>
+                    </div>
+
+
+                  </div>
+
+
+
+              </div>
+              </section>
+
+            </div>
+
+            <!-- Right Charges & Payment Panel -->
+            <div class="form-columns-right">
+
+              <section class="section-panel" style="position: sticky; top: 1.5rem;">
+                <h3 class="panel-header"><i class="fa-solid fa-indian-rupee-sign"></i> Tariff Calculations</h3>
+
+                <div class="tariff-grid">
+                  <div class="tariff-row">
+                    <span>Price</span>
+                    <input type="number" id="billPrice" value="150" min="0" oninput="calculateTariff()">
+                  </div>
+                  <div class="tariff-row">
+                    <span>Quantity</span>
+                    <input type="number" id="bookQty" value="1" min="1" oninput="calculateTariff()" required style="width: 80px; text-align: right; border: 1px solid var(--border); border-radius: 4px; padding: 4px;">
+                  </div>
+                  <div class="tariff-row">
+                    <span>Basic Freight</span>
+                    <strong id="billBasicFreightText" style="color:var(--text-muted);">₹150.00</strong>
+                    <input type="hidden" id="billBasicFreight" value="150">
+                  </div>
+                  <div class="tariff-row">
+                    <span>Handling Charges</span>
+                    <input type="number" id="billHandling" value="20" min="0" oninput="calculateTariff()">
+                  </div>
+
+
+                  <hr style="border: 0; border-top: 1px solid var(--border); margin: 8px 0;">
+
+                  <div class="tariff-row">
+                    <span>
+                      GST Tax
+                      <select id="billGstRate" onchange="calculateTariff()" style="margin-left: 8px; padding: 2px 4px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--text);">
+                        <option value="0">0%</option>
+                        <option value="5">5%</option>
+                        <option value="12">12%</option>
+                      </select>
+                    </span>
+                    <strong id="billGst" style="color:var(--text-muted);">₹45.00</strong>
+                  </div>
+
+                  <div class="tariff-row total-row">
+                    <span>Grand Total</span>
+                    <strong id="billGrandTotal" class="total-value">₹295.00</strong>
+                  </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 15px 0;">
+
+                <!-- Payment Mode Selection -->
+                <div class="form-group">
+                  <label class="form-label" for="bookPaymentMode">Payment Method</label>
+                  <select id="bookPaymentMode" class="booking-form-select">
+                    <option value="Paid">Paid</option>
+                    <option value="To Pay">To Pay</option>
+                  </select>
+                </div>
+
+                <div class="actions-bar" style="flex-direction: column;">
+                  <button type="submit" class="btn-primary" style="width: 100%;"><i class="fa-solid fa-save"></i> Save
+                    Booking</button>
+                  <button type="button" class="btn-secondary" style="width: 100%;" onclick="resetBookingForm()"><i
+                      class="fa-solid fa-rotate-left"></i> Reset Form</button>
+                </div>
+
+              </section>
+
+            </div>
+
+        </div>
+        </form>
+
+        <!-- Branch Recent Bookings sub-list in Parcel Booking Tab -->
+        <div class="table-container" style="margin-top:2rem;">
+          <div style="padding:16px; border-bottom:1px solid var(--border);">
+            <h3 style="font-size:1.1rem; font-weight:600; color:var(--text-main);"><i class="fa-solid fa-history"
+                style="margin-right:8px;"></i> Recent Cargo Booked at Branch</h3>
+          </div>
+          <table class="data-table" id="bookingTabRecentTable">
+            <thead>
+              <tr>
+                <th>LR Number</th>
+                <th>Booking Date</th>
+                <th>Destination</th>
+                <th>Sender</th>
+                <th>Receiver</th>
+                <th>Qty / Item</th>
+                <th>Payment</th>
+                <th>Total Cargo Bill</th>
+                <th>Receipt</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- js populated -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- search & track -->
+      <div id="tab-tracking" class="dashboard-tab">
+
+        <section class="section-panel">
+          <h3 class="panel-header"><i class="fa-solid fa-magnifying-glass"></i> Branch Consignment Locator</h3>
+          <p style="color:var(--text-muted); margin-bottom: 1.5rem;">
+            Search the local and cross-branch logistics pipeline. Enter the LR Docket Number, Consignor name, or
+            Consignee mobile.
+          </p>
+          <div style="display:flex; gap:10px; margin-bottom:1.5rem;">
+            <input type="text" id="trackSearchInput" class="form-input" style="padding-left:15px; font-size:1rem;"
+              placeholder="Search by LR number (e.g. LR-2026-0001), Sender/Receiver Name or Mobile">
+            <button class="btn-primary" onclick="performTrackSearch()" style="padding: 10px 24px;"><i
+                class="fa-solid fa-search"></i> Search</button>
+          </div>
+        </section>
+
+        <div class="table-container">
+          <table class="data-table" id="trackResultsTable">
+            <thead>
+              <tr>
+                <th>LR Number</th>
+                <th>Date</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Consignor</th>
+                <th>Consignee</th>
+                <th>Payment</th>
+                <th>Bill Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="10" style="text-align: center; color: var(--text-muted);">Enter search criteria above to
+                  fetch shipments.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- reports -->
+      <div id="tab-reports" class="dashboard-tab">
+
+        <section class="section-panel">
+          <h3 class="panel-header"><i class="fa-solid fa-chart-line"></i> Dynamic Branch Ledger</h3>
+          <p style="color:var(--text-muted); margin-bottom:1rem;">
+            View consolidated logistics summaries and invoicing details.
+          </p>
+          <div style="display:flex; gap:10px; margin-bottom:1.5rem; align-items:flex-end; flex-wrap:wrap;">
+            <div class="form-group" style="margin-bottom:0; min-width: 150px;">
+              <label for="reportFromDate"
+                style="color:var(--text-main); font-weight:500; font-size: 0.85rem; margin-bottom: 5px; display: block;">From
+                Date</label>
+              <input type="date" id="reportFromDate" class="form-input" style="padding-left:10px;">
+            </div>
+            <div class="form-group" style="margin-bottom:0; min-width: 150px;">
+              <label for="reportToDate"
+                style="color:var(--text-main); font-weight:500; font-size: 0.85rem; margin-bottom: 5px; display: block;">To
+                Date</label>
+              <input type="date" id="reportToDate" class="form-input" style="padding-left:10px;">
+            </div>
+            <div class="form-group" style="margin-bottom:0; min-width: 150px;">
+              <label for="reportGroupBy"
+                style="color:var(--text-main); font-weight:500; font-size: 0.85rem; margin-bottom: 5px; display: block;">Group
+                By</label>
+              <select id="reportGroupBy" class="form-input" style="padding-left:10px;">
+                <option value="payment">Payment Mode</option>
+                <option value="date">Date</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="generateReportSummary()" style="height: 42px; padding: 0 20px;"><i
+                class="fa-solid fa-sync"></i> Generate Report</button>
+          </div>
+        </section>
+
+        <div class="table-container">
+          <table class="data-table" id="reportsSummaryTable">
+            <thead>
+              <tr>
+                <th>Payment Mode</th>
+                <th>Consignments Count</th>
+                <th>Total Base Freight</th>
+                <th>Total Tax (18% GST)</th>
+                <th>Consolidated Grand Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- generated by js -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- admin control panel -->
+      <div id="tab-admin" class="dashboard-tab">
+        <div class="grid-2col">
+          <!-- manage branches form -->
+          <section class="section-panel" style="margin-bottom:0;">
+            <h3 class="panel-header"><i class="fa-solid fa-code-branch"></i> Create New Branch</h3>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:5px; margin-bottom:15px;">
+              Add new shipping destination branches.
+            </p>
+            <form id="adminBranchForm" onsubmit="handleCreateBranch(event)"
+              style="display:flex; flex-direction:column; gap:15px;">
+              <div class="form-group">
+                <label for="adminBranchCode">Branch Code (Lowercase, e.g. 'pune')</label>
+                <input type="text" id="adminBranchCode" required placeholder="e.g. pune" style="width:100%;"
+                  pattern="[a-z0-9]+" title="Only lowercase letters and numbers allowed">
+              </div>
+              <div class="form-group">
+                <label for="adminBranchName">Branch Name (Capitalized, e.g. 'Pune')</label>
+                <input type="text" id="adminBranchName" required placeholder="e.g. Pune" style="width:100%;">
+              </div>
+              <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Create Branch</button>
+            </form>
+          </section>
+
+          <!-- manage users form -->
+          <section class="section-panel" style="margin-bottom:0;">
+            <h3 class="panel-header"><i class="fa-solid fa-user-plus"></i> Create Branch Agent Account</h3>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-top:5px; margin-bottom:15px;">
+              Issue login credentials for agents at specific branches.
+            </p>
+            <form id="adminUserForm" onsubmit="handleCreateUser(event)"
+              style="display:flex; flex-direction:column; gap:15px;">
+              <div class="form-group">
+                <label for="adminUserBranch">Assign Branch</label>
+                <select id="adminUserBranch" required style="width:100%;">
+                  <!-- dynamic -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="adminUserName">Agent Full Name</label>
+                <input type="text" id="adminUserName" required placeholder="e.g. Pune Agent" style="width:100%;">
+              </div>
+              <div class="form-group">
+                <label for="adminUserUsername">Username</label>
+                <input type="text" id="adminUserUsername" required placeholder="e.g. pune_branch" style="width:100%;">
+              </div>
+              <div class="form-group">
+                <label for="adminUserPassword">Password</label>
+                <input type="password" id="adminUserPassword" required placeholder="password123" style="width:100%;">
+              </div>
+              <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Create Agent Account</button>
+            </form>
+          </section>
+        </div>
+
+        <!-- change user password form -->
+        <section class="section-panel" style="margin-top:2rem;">
+          <h3 class="panel-header"><i class="fa-solid fa-key"></i> Change User / Agent Password</h3>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:5px; margin-bottom:15px;">
+            Reset or update passwords for any branch agent or your own admin account.
+          </p>
+          <form id="adminChangePasswordForm" onsubmit="handleUpdatePassword(event)"
+            style="max-width: 500px; display:flex; flex-direction:column; gap:15px;">
+            <div class="form-group">
+              <label for="changePasswordUser">Select User / Agent</label>
+              <select id="changePasswordUser" required style="width:100%;">
+                <!-- dynamic -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="changePasswordNewPassword">New Password</label>
+              <input type="password" id="changePasswordNewPassword" required placeholder="Enter new password"
+                style="width:100%;">
+            </div>
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-save"></i> Update Password</button>
+          </form>
+        </section>
+
+        <!-- manage agents table -->
+        <section class="section-panel" style="margin-top:2rem;">
+          <h3 class="panel-header"><i class="fa-solid fa-users"></i> Manage Agents</h3>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:5px; margin-bottom:15px;">
+            View, edit, or remove agent accounts.
+          </p>
+          <div class="table-container">
+            <table class="data-table" id="adminUsersTable">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Agent Name</th>
+                  <th>Branch Code</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- dynamic -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+  </div>
+  </main>
+
+  </div>
+
+  <!-- Thermal/Docket LR Receipt Modal -->
+  <div class="modal-overlay" id="lrReceiptModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-print"></i> Lorry Receipt (LR) Docket Viewer</h3>
+        <button type="button" class="btn-close-modal" onclick="closeLrModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <!-- Twin sticker receipt layout -->
+        <div class="lr-print-receipt" id="receiptPrintArea">
+
+          <!-- left sticker -->
+          <div class="lr-sticker">
+            <div style="text-align: center; font-size: 24px; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 4px;">Rcargo</div>
+            <div class="lr-sticker-grid">
+
+              <!-- Row 1 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">GRN No :</span>
+                <span class="lr-value" id="prLrNo_1" style="font-size: 18px; font-weight: 800;">LR-2026-0001</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Bkg DT:</span>
+                <span class="lr-value" id="prDate_1">26-06-2026 11:32 AM</span>
+              </div>
+
+              <!-- Row 2 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">From City :</span>
+                <span class="lr-value" id="prOrigin_1" style="font-weight: 700;">Ahmedabad</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">To City :</span>
+                <span class="lr-value" id="prDest_1" style="font-weight: 700;">Mumbai</span>
+              </div>
+
+              <!-- Row 3 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Sender:</span>
+                <span class="lr-value" id="prSendName_1">Sender Org</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">GST No.:</span>
+                <span class="lr-value">-</span>
+              </div>
+
+              <!-- Row 4 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Receiver Name:</span>
+                <span class="lr-value" id="prRecName_1">Receiver Org</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Receiver No:</span>
+                <span class="lr-value" id="prRecNo_1">-</span>
+              </div>
+
+              <!-- Row 5 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Booking Type :</span>
+                <span class="lr-value" id="prPayment_1" style="font-weight: 700;">Paid</span>
+              </div>
+              <div class="lr-col-item">
+                <!-- empty gap matching image -->
+              </div>
+
+              <!-- Row 6 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">No Of Pkgs:</span>
+                <span class="lr-value" id="prQty_1">2 (2-Box)</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Freight :</span>
+                <span class="lr-value">Rs.<span id="prBasic_1">560</span></span>
+              </div>
+
+              <!-- Row 7 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Loading :</span>
+                <span class="lr-value">Rs.<span id="prHandling_1">0</span></span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">GST :</span>
+                <span class="lr-value">Rs.<span id="prGst_1">0</span></span>
+              </div>
+
+              <!-- Row 8 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Transp. Charge :</span>
+                <span class="lr-value">Rs.<span id="prTransp_1">0</span></span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Total Amount :</span>
+                <span class="lr-value" style="font-weight: 800; font-size: 16px;">Rs.<span
+                    id="prTotal_1">560</span></span>
+              </div>
+
+              <!-- Row 9 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Book By :</span>
+                <span class="lr-value" id="prBookBy_1">agent</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Print By:</span>
+                <span class="lr-value" id="prPrintBy_1">agent</span>
+              </div>
+
+              <!-- Row 10 -->
+              <div class="lr-col-item lr-span-2">
+                <span class="lr-bold-label">Remarks:</span>
+                <span class="lr-value" id="prRemarks_1">-</span>
+              </div>
+
+              <!-- Row 11 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Print DT:</span>
+                <span class="lr-value" id="prPrintDt_1">26-06-2026 11:32 AM</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">GST :</span>
+                <span class="lr-value">-</span>
+              </div>
+
+              <!-- GTA Disclaimer text -->
+              <div class="lr-sticker-disclaimer">
+                "I/We have taken registration under the CGST Act, 2017 and have exercised the option to pay tax on
+                services of GTA in relation to transport of goods supplied by us during the Financial year----- under
+                the forward charge."
+              </div>
+
+            </div>
+          </div>
+
+          <!-- right duplicate sticker -->
+          <div class="lr-sticker">
+            <div style="text-align: center; font-size: 24px; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 4px;">Rcargo</div>
+            <div class="lr-sticker-grid">
+
+              <!-- Row 1 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">GRN No :</span>
+                <span class="lr-value" id="prLrNo_2" style="font-size: 18px; font-weight: 800;">LR-2026-0001</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Bkg DT:</span>
+                <span class="lr-value" id="prDate_2">26-06-2026 11:32 AM</span>
+              </div>
+
+              <!-- Row 2 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">From City :</span>
+                <span class="lr-value" id="prOrigin_2" style="font-weight: 700;">Ahmedabad</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">To City :</span>
+                <span class="lr-value" id="prDest_2" style="font-weight: 700;">Mumbai</span>
+              </div>
+
+              <!-- Row 3 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Sender:</span>
+                <span class="lr-value" id="prSendName_2">Sender Org</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">GST No.:</span>
+                <span class="lr-value">-</span>
+              </div>
+
+              <!-- Row 4 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Receiver Name:</span>
+                <span class="lr-value" id="prRecName_2">Receiver Org</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Receiver No:</span>
+                <span class="lr-value" id="prRecNo_2">-</span>
+              </div>
+
+              <!-- Row 5 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Booking Type :</span>
+                <span class="lr-value" id="prPayment_2" style="font-weight: 700;">Paid</span>
+              </div>
+              <div class="lr-col-item">
+                <!-- empty gap matching image -->
+              </div>
+
+              <!-- Row 6 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">No Of Pkgs:</span>
+                <span class="lr-value" id="prQty_2">2 (2-Box)</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Freight :</span>
+                <span class="lr-value">Rs.<span id="prBasic_2">560</span></span>
+              </div>
+
+              <!-- Row 7 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Loading :</span>
+                <span class="lr-value">Rs.<span id="prHandling_2">0</span></span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">GST :</span>
+                <span class="lr-value">Rs.<span id="prGst_2">0</span></span>
+              </div>
+
+              <!-- Row 8 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Transp. Charge :</span>
+                <span class="lr-value">Rs.<span id="prTransp_2">0</span></span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Total Amount :</span>
+                <span class="lr-value" style="font-weight: 800; font-size: 16px;">Rs.<span
+                    id="prTotal_2">560</span></span>
+              </div>
+
+              <!-- Row 9 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Book By :</span>
+                <span class="lr-value" id="prBookBy_2">agent</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Print By:</span>
+                <span class="lr-value" id="prPrintBy_2">agent</span>
+              </div>
+
+              <!-- Row 10 -->
+              <div class="lr-col-item lr-span-2">
+                <span class="lr-bold-label">Remarks:</span>
+                <span class="lr-value" id="prRemarks_2">-</span>
+              </div>
+
+              <!-- Row 11 -->
+              <div class="lr-col-item">
+                <span class="lr-bold-label">Print DT:</span>
+                <span class="lr-value" id="prPrintDt_2">26-06-2026 11:32 AM</span>
+              </div>
+              <div class="lr-col-item">
+                <span class="lr-bold-label">GST :</span>
+                <span class="lr-value">-</span>
+              </div>
+
+              <!-- GTA Disclaimer text -->
+              <div class="lr-sticker-disclaimer">
+                "I/We have taken registration under the CGST Act, 2017 and have exercised the option to pay tax on
+                services of GTA in relation to transport of goods supplied by us during the Financial year----- under
+                the forward charge."
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" onclick="printReceipt()"><i class="fa-solid fa-print"></i> Send to
+          Printer</button>
+        <button type="button" class="btn-secondary" onclick="closeLrModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+  <script src="dashboard.js"></script>
+  <script src="news.js"></script>
+  <script src="bookings.js"></script>
+  <script src="stats.js"></script>
+  <script src="tracking.js"></script>
+  <script src="reports.js"></script>
+  <script src="print.js"></script>
+  <script src="ui-helpers.js"></script>
+  <script src="admin.js"></script>
+  <script>
+    // Initialize Dashboard Page
+    document.addEventListener("DOMContentLoaded", () => {
+      // Validate credentials
+      checkAuth();
+
+      // Load branches lists and overview stats
+      loadBranchDropdowns();
+      refreshDashboardStats();
+      loadDashboardRecentBookings();
+    });
+  </script>
+</body>
+
+</html>
