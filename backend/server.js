@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const http = require('http');
+const WebSocket = require('ws');
 const { Op } = require('sequelize');
 
 const { initDatabase, sequelize, Branch, User, News, Booking, saveToDbJson } = require('./db');
@@ -13,6 +15,24 @@ const likeOp = sequelize.options.dialect === 'postgres' ? Op.iLike : Op.like;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+// WebSocket connection handling
+wss.on('connection', (ws) => {
+  console.log('New WebSocket client connected');
+  ws.on('close', () => console.log('WebSocket client disconnected'));
+});
+
+// Broadcast helper for real-time updates
+const broadcastDashboardUpdate = () => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: 'REFRESH_DASHBOARD' }));
+    }
+  });
+};
 
 app.use(cors());
 app.use(morgan('dev'));
@@ -352,6 +372,9 @@ app.post('/api/bookings', async (req, res) => {
 
     await saveToDbJson();
 
+    // Broadcast update to all clients
+    broadcastDashboardUpdate();
+
     res.status(201).json({ success: true, message: 'Booking saved successfully', booking: responseData });
   } catch (err) {
     console.error('Error creating booking:', err);
@@ -515,6 +538,9 @@ app.delete('/api/bookings/:lrNumber', async (req, res) => {
     await booking.destroy();
     await saveToDbJson();
 
+    // Broadcast update to all clients
+    broadcastDashboardUpdate();
+
     res.json({ success: true, message: `Booking ${lrNumber} deleted successfully` });
   } catch (err) {
     console.error('Error deleting booking:', err);
@@ -570,8 +596,8 @@ app.get('*', (req, res) => {
 
 // setup db & start server
 initDatabase().then(() => {
-  app.listen(PORT, () => {
-    console.log(`server is up on port ${PORT}`);
+  server.listen(PORT, () => {
+    console.log(`server & WebSocket are up on port ${PORT}`);
   });
 }).catch(err => {
   console.error('db init failed:');

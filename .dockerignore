@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.env
+.git
+.gitignore
+backend/node_modules
+backend/rcargo.sqlite
+Dockerfile
+docker-compose.yml
+.dockerignore

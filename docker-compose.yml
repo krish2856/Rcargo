@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      # -- PostgreSQL Setup (Optional) --
+      # To use PostgreSQL instead of SQLite, uncomment the DATABASE_URL below 
+      # and the 'db' service configuration at the bottom.
+      # - DATABASE_URL=postgres://rcargo:password@db:5432/rcargo
+    # volumes:
+    #   - ./backend/rcargo.sqlite:/usr/src/app/backend/rcargo.sqlite
+    #   - ./backend/db.json:/usr/src/app/backend/db.json
+
+  # -- PostgreSQL Database Service (Optional) --
+  # db:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     - POSTGRES_USER=rcargo
+  #     - POSTGRES_PASSWORD=password
+  #     - POSTGRES_DB=rcargo
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+# volumes:
+#   pgdata:
